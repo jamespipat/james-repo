@@ -1,0 +1,571 @@
+PUT /catalog/product/1
+{    
+  "sku": "SP000002",    
+  "title": "Google Pixel Phone 32GB - 5 inch display",    
+  "description": "Google Pixel Phone 32GB - 5 inch display (Factory Unlocked US Version)",    
+  "price": 400.00,    
+  "resolution": "1440 x 2560 pixels", 
+  "os": "Android 7.1"
+}
+
+PUT /catalog/product/1
+{   
+  "sku": "SP000001",    
+  "title": "Elasticsearch for Hadoop",
+  "description": "Elasticsearch for Hadoop",    
+  "author": "Vishal Shukla",    
+  "ISBN": "1785288997",    
+  "price": 26.99
+  
+}
+
+GET /catalog/product/1
+
+POST /catalog/product/1/_update
+{  
+   "doc": {    "price": "28.99"  }
+}
+
+DELETE /catalog/product/1
+
+Creating an index
+PUT /catalog
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 5,
+      "number_of_replicas": 2
+    }
+  },
+  "mappings": {
+    "type's name": {
+      "properties": {
+        "field1": {
+          "type": "text"
+        },
+        "field2": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+
+Creating type mapping in an existing index
+PUT /catalog/_mapping/category
+{
+  "properties": {
+    "name": {
+      "type": "text"
+    }
+  }
+}
+
+Updating a mapping
+PUT /catalog/_mapping/category
+{
+  "properties": {
+    "code": {
+      "type": "keyword"
+    }
+  }
+}
+
+Searching
+GET /index/type/_search
+GET /_all/type/_search
+
+
+structured query(term level queries)
+Most structured queries do not need relevance-based scoring (one of the low-level query)
+Range query
+-on numeric types
+GET /amazon_products/products/_search
+{
+  "query": {
+    "range": {
+      "price": {
+        "gte": 10,
+        "lte": 20
+      }
+    }
+  }
+}
+-with score boosting
+GET /amazon_products/products/_search
+{
+  "from": 0,
+  "size": 10,
+  "query": {
+    "range": {
+      "price": {
+        "gte": 10,
+        "lte": 20,
+        "boost": 2.2
+      }
+    }
+  }
+}
+-Range query on dates
+GET /orders/order/_search
+{
+    "query": {
+        "range" : {
+            "orderDate" : {
+                "gte": "01/09/2017",
+                "lte": "30/09/2017",
+                "format": "dd/MM/yyyy"
+            }
+        }
+    }
+}
+-Exists query
+records which have non-null and non-empty values in a certain field
+GET /amazon_products/products/_search
+{
+  "query": {
+    "exists": {
+      "field": "description"
+    }
+  }
+}
+-Term query
+The name of a search can possibly contain white spaces
+GET /amazon_products/products/_search
+{
+  "query": {
+    "term": {
+      "manufacturer.raw": "victory multimedia"
+    }
+  }
+}
+GET /amazon_products/products/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "term": {
+          "manufacturer.raw": "victory multimedia"
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+Full-text query
+one of the high-level queries (find the best matching documents according to the score)
+Match query
+GET /amazon_products/products/_search
+{
+  "query": {
+    "match": {
+      "manufacturer.raw": "victory multimedia"
+    }
+  }
+}
+
+GET /amazon_products/products/_search
+{
+  "query": {
+    "match": {
+      "manufacturer": "victory multimedia"
+    }
+  }
+}
+
+Operator
+GET /amazon_products/products/_search
+{
+  "query": {
+    "match": {
+      "manufacturer": {
+        "query": "victory multimedia",
+        "operator": "and"
+      }
+    }
+  }
+}
+minimum_should_match
+GET /amazon_products/products/_search
+{
+  "query": {
+    "match": {
+      "manufacturer": {
+        "query": "victory multimedia",
+        "minimum_should_match": 2
+      }
+    }
+  }
+}
+Fuzziness(error)
+GET /amazon_products/products/_search
+{
+  "query": {
+    "match": {
+      "manufacturer": {
+        "query": "victor multimedia",
+        "fuzziness": 1(0,1,2,auto)
+      }
+    }
+  }
+}
+
+Match phrase query
+want to match a sequence of words exactly not saparate. also supports the slop parameter 
+GET /amazon_products/products/_search
+{
+  "query": {
+    "match_phrase": {
+      "description": {
+        "query": "real video aquarium",
+        "slop": 1
+      }
+    }
+  }
+}
+
+Multi match query
+allows us to run the match query across multiple fields
+- Querying multiple fields with defaults
+	GET /amazon_products/products/_search
+	{
+	  "query": {
+		"multi_match": {
+		  "query": "monitor aquarium", 
+		  "fields": ["title", "description"]
+		}
+	  }
+	}
+- Boosting one or more fields
+	GET /amazon_products/products/_search
+	{
+	  "query": {
+		"multi_match": {
+		  "query": "monitor aquarium", 
+		  "fields": ["title^3", "description"]
+		}
+	  }
+	}
+
+Compound queries
+combine one or more queries to come up with a more complex query
+
+- Constant score query
+convert a scoring query which normally runs in query context to a non-scoring filter context
+this example combines the constatnt score and boosting score queries
+GET /amazon_products/products/_search
+{
+  "query": {
+    "constant_score": {
+      "filter": {
+        "term": {
+          "manufacturer.raw": "victory multimedia"
+          
+        }
+      },
+      "boost": 1.2
+    }
+  }
+}
+
+-Bool query
+the bool query allows you to combine multiple scoring and non-scoring queries.
+    -Combining OR conditions
+	GET /amazon_products/products/_search
+	{
+	  "query": {
+		"constant_score": {
+		  "filter": {
+			"bool": {
+			  "should": [
+				{
+				  "range": {
+					"price": {
+					  "gte": 10,
+					  "lte": 13
+					}
+				  }
+				},
+				{
+				  "term": {
+					"manufacturer.raw": {
+					  "value": "valuesoft"
+					}
+				  }
+				}
+			  ]
+			}
+		  }
+		}
+	  }
+	}
+	want to OR the conditions, we have placed them under should.
+
+	- Combining conditions AND and OR conditions
+	GET /amazon_products/products/_search
+	{
+	  "query": {
+		"constant_score": {
+		  "filter": {
+			"bool": {
+			  "must": [
+				{
+				  "range": {
+					"price": {
+					  "gte": 10,
+					  "lte": 30
+					}
+				  }
+				}
+			  ],
+			  "should": [
+				{
+				  "term": {
+					"manufacturer.raw": {
+					  "value": "valuesoft"
+					}
+				  }
+				},
+				{
+				  "term": {
+					"manufacturer.raw": {
+					  "value": "pinnacle"
+					}
+				  }
+				}
+			  ]
+			}
+		  }
+		}
+	  }
+	}
+	ORed together are placed inside should. ANDed together, can be placed inside the must element
+	-Adding NOT conditions
+	 add NOT conditions, that is, specifically filtering out certain clauses using the must_not clause in the bool filter
+	GET /amazon_products/products/_search
+	{
+	  "query": {
+		"constant_score": {
+		  "filter": {
+			"bool": {
+			  "must": [
+				{
+				  "range": {
+					"price": {
+					  "gte": 10,
+					  "lte": 20
+					}
+				  }
+				}
+			  ],
+			  "must_not": [
+				{
+				  "term": {
+					"manufacturer.raw": "encore"
+				  }
+				}
+			  ]
+			}
+		  }
+		}
+	  }
+	}
+Aggregation
+Metric Aggreagation
+-Sum aggregation
+GET bigginsight/_search
+{
+ "aggregations": {                     
+    "download_sum": {                  
+      "sum": {                         
+        "field": "downloadTotal"       
+      }      
+    }
+  },
+  "size": 0                            
+}
+
+-Average aggregation
+GET bigginsight/_search
+{
+ "aggregations": {                     
+    "download_average": {                  
+      "avg": {                             
+        "field": "downloadTotal"       
+      }      
+    }
+  },
+  "size": 0                            
+}
+
+-Min aggregation
+find the minimum value
+GET bigginsight/_search
+{
+ "aggregations": {                    
+    "download_min": {                  
+      "min": {                         
+        "field": "downloadTotal"       
+      }      
+    }
+  },
+  "size": 0                            
+}
+
+-Max aggregation
+find the maximum value
+ET bigginsight/_search
+{
+ "aggregations": {                    
+    "download_max": {                  
+      "max": {                         
+        "field": "downloadTotal"       
+      }      
+    }
+  },
+  "size": 0                            
+}
+
+-Stats aggregation
+The stats aggregation computes the sum, average, min, max, and count of documents in a single pass
+GET bigginsight/_search
+{
+ "aggregations": {
+    "download_stats": {
+      "stats": {
+        "field": "downloadTotal"
+      }
+    }
+  },
+  "size": 0
+}
+
+-Extended stats Aggregation
+returns a few more statistics in addition to the ones returned by the stats aggregation
+GET bigginsight/_search
+{
+ "aggregations": {
+    "download_estats": {
+      "extended_stats": {
+        "field": "downloadTotal"
+      }
+    }
+  },
+  "size": 0
+}
+
+-Cardinality aggregation
+the number of unique values for a specific field
+GET bigginsight/_search
+{
+ "aggregations": {
+    "unique_visitors": {
+      "cardinality": {
+        "field": "username"
+      }
+    }
+  },
+  "size": 0
+}
+
+Bucket Aggreagation
+Each type of bucket aggregation slices the data into different segments or buckets
+	Bucketing on string data
+	-Terms aggregation
+	segmenting or grouping the data by a given field's distinct values
+	GET /bigginsight/usageReport/_search
+	{
+	  "aggs": {                           
+		"byCategory": {                   
+		  "terms": {                      
+			"field": "category"           
+		  }
+		}
+	  },
+	  "size": 0                           
+	}
+	GET /bigginsight/usageReport/_search?size=0
+	{
+	  "aggs": {
+		"byApplication": {
+		  "terms": {
+			"field": "application",
+			"size": 15
+		  }
+		}
+	  }
+	}
+
+	Bucketing on numeric data
+	-Histogram aggregation
+	The range of each slice, also called the interval, can be specified in the input of the query
+	POST /bigginsight/_search?size=0
+	{
+	  "aggs": {
+		"by_usage": {
+		  "histogram": {
+			"field": "usage",
+			"interval": 1000  (0 to 999, 1,000 to 1,999),
+			"min_doc_count": 1 (at least 1 doc in the given field)
+		  }
+		}
+	  }
+	}
+	-Range aggregation
+	create unequal sized buckets
+	POST /bigginsight/_search?size=0
+	{
+	  "aggs": {
+		"by_usage": {
+		  "range": {
+			"field": "usage",
+			"ranges": [
+			  { "to": 1024 },
+			  { "from": 1024, "to": 102400 },
+			  { "from": 102400 }
+			]
+		  }
+		}
+	  }
+	}
+
+	Aggregations on filtered data
+	query applies multiple filters and makes the scope of the aggregation more specific
+	GET /bigginsight/usageReport/_search?size=0
+	{
+	  "query": {
+		"term": {
+		  "customer": "Linkedin"
+		}
+	  }, 
+	  "aggs": {                           
+		"byCategory": {                   
+		  "terms": {                      
+			"field": "category"           
+		  }
+		}
+	  }                        
+	}
+	GET /bigginsight/usageReport/_search?size=0
+	{
+	  "query": {
+		"bool": {
+		  "must": [
+			{"term": {"customer": "Linkedin"}}, 
+			{"range": {"time": {"gte": 1506277800000, "lte": 1506294200000}}}
+		  ]
+		}
+	  },
+	  "aggs": {
+		"byCategory": {
+		  "terms": {
+			"field": "category"
+		  }
+		}
+	  }
+	}
