@@ -1,0 +1,38 @@
+server {
+        listen 80;
+        server_name 127.0.0.1 localhost;
+        root /etc/nginx/html;
+
+        location /app1/ {
+                index index.html;
+        }
+
+        location  /app2/ {
+                index home.html;
+        }
+#        location ~ \.(png|jpg|jpeg)$ {
+#                expires max;
+#        }
+
+#        location ~* \.(png|jpg|jpeg)$ {
+#                expires 10d;
+#        }
+        location ~* \.(jpg|jpeg)$ {
+                root /etc/nginx/html/common;
+        }
+        location ~* \.(png|jpg|jpeg)$ {
+                root /etc/nginx/html/common;
+                try_files $uri $uri/ /nginx.png =404;
+        }
+}
+
+location ∼* \.(png)$ {
+        root /etc/nginx/html/common;
+        try_files $uri $uri/ /nginx.png @mylocation;
+}
+
+location @mylocation{
+        ...
+        #do something here
+        ...
+}
