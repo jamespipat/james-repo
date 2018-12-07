@@ -1,0 +1,46 @@
+iptables commmand
+
+CHAIN RULE
+the sets of rules are called chains and the rules are applied in order, there are five filtering points process packets:
+1.PREROUTING handles packets before the routing decision process.
+2.INPUT handles packets destined for the local system.
+3.FORWARD handles packets being forwarded to a remote system.
+4.OUTPUT handles packets output from the local system
+5.POSTROUTING handles packets being sent to remote systems, after the forward filter.
+
+TABLE
+Each chain contains tables that define rules for handling the packets
+1.FILTER applies rules to allow or block packets from exiting the chain.
+2.MANGLE applies rules to change features of the packets before they exit the chain.
+3.NAT applies rules to change the addresses of the packets before they exit the chain.
+
+TARGET
+Normally when a rule matches, no additional rules are tested and the chain exits
+each chain has a target policy value. The policy target defines how packets are handled by default for the chain when no rules 
+apply to the packet
+there are built-in policy and extended policy 
+1.Accept: built-in
+2.DROP: built-in
+3.LOG: extended
+4.REJECT: extended
+.
+.
+.
+
+option
+-A chain rule  -->  Add a new rule to the specified chain.
+-D chain rule  -->  Delete a rule from the specified chain.
+-F [chain]  -->  Remove all rules for the specified chain or all chains if none is specified.
+-I chain index rule  -->  Insert a new rule into the specified chain at the specified index location.
+-L [chain]  -->  List the rules in the specified chain or all chains if not specified.
+-P chain target  -->  Define the default policy for the specified chain.
+-R chain index rule  -->  Replace the rule at the specified index location.
+-S [chain]  -->  List the rules in detail of the specified chain or all chains if not specified.
+-t table  -->  Specify the table the rule applies to.
+-d address  -->  The destination address
+-g chain  -->  Jump to a new chain
+-i name  -->  The input interface
+-j target  -->  The action to take
+-o name  -->  The output interface
+-p protocol  -->  Matches a specific protocol, such as tcp, upd, or icmp ...
+-s address  -->  The source address
