@@ -36,3 +36,14 @@ location @mylocation{
         #do something here
         ...
 }
+
+change directory common to vendor_assets
+server {
+        listen 80;
+        server_name 127.0.0.1 localhost;
+        root /etc/nginx/html;
+
+        location /common/ {
+                rewrite ^(/common/)(.*) /vendor_assets/$2 last;
+        }
+}
