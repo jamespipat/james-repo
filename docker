@@ -1,0 +1,50 @@
+There are three ways to create a new container image
+
+1.Interactive image creation
+attach to interactive shell in container and run package manager
+docker container -it --name sample alpine /bin/bash
+docker container diff
+- to persist our modifications and create a new image from them
+docker container commit sample my-alpine
+- to see how our custom image has been built
+docker image history my-alpine
+
+2.Dockerfiles
+- It contains instructions on how to build a custom container image
+building form base layer to higher layer when first layer was built, 
+then higher layer was built from container which has preceding layer and 
+run second statement on dockerfile and so on
+- docker image build -t . or docker image build -t -f /path/dockerfile
+
+- keyword
+FROM
+- define which base image we want to start building our custom image from
+FROM centos:7, FROM scratch
+
+RUN 
+- The argument for RUN is any valid Linux command
+
+COPY & ADD
+- these two keywords are used to copy files and folders from the host into the image that we're building
+ADD keyword also lets us copy and unpack TAR files, as well as provide a URL as a source for the files and folders to copy
+COPY . /app
+COPY ./web /app/web
+COPY sample.txt /data/my-sample.txt
+ADD sample.tar /app/bin/
+ADD http://example.com/sample.txt /data
+- Wildcards are allowed in the source path
+COPY ./sample* /mydir/
+- by default, all files and folders inside the image will have a user ID (UID) and a group ID (GID) of 0
+ADD --chown=11:22 ./data/files* /app/data/
+**we can use usernames and groups but they have to be in container before
+
+WORKDIR
+- change working directory as of this line
+
+CMD & ENTRYPOINT
+- these two are actually definitions of what will happen when a container is started from the image we define
+CMD = command, ENTRYPOINT = parameter (in JSON array)
+ENTRYPOINT ["ping"]
+CMD ["8.8.8.8", "-c", "3"]
+- or just use only CMD keyword it will work as well
+CMD ping 8.8.8.8 -c 3
