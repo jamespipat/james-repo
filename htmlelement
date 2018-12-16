@@ -31,5 +31,9 @@
 	7.footer element: is for grouping together information to form a footer. Typically, the footer holds content such as 
 	copyright data, author information, or related links
 	
-
-
+- Table element: is a block element
+	<caption></caption> ## if you woold like
+	<tr><th>...</th></tr>
+	<tr><td>...</td></tr>
+	
+	
