@@ -1,4 +1,4 @@
-There are three ways to create a new container image
+## There are three ways to create a new container image ##
 
 1.Interactive image creation
 attach to interactive shell in container and run package manager
@@ -48,3 +48,47 @@ ENTRYPOINT ["ping"]
 CMD ["8.8.8.8", "-c", "3"]
 - or just use only CMD keyword it will work as well
 CMD ping 8.8.8.8 -c 3
+
+## Best practices ##
+1. When we're rebuilding a previously built image, the only layers that are rebuilt are the ones that have changed,
+but if one layer needs to be rebuilt, all subsequent layers also need to be rebuilt.
+2. the fewer layers an image has, the faster the startup time for the container can be
+ex. RUN apt-get update \
+    && apt-get install -y ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+3. Smaller images
+  - use a .dockerignore file
+  - avoid installing unnecessary packages into the filesystem of the image
+  - use multistage builds
+  
+## Saving and loading images ##
+- to export an existing image to a tarball
+  docker image save -o ./backup/my-alpine.tar my-alpine
+- to import it as an image into our system
+  docker image load -i ./backup/my-alpine.tar
+  
+## Sharing or shipping images ##
+publish the image to a central location from which other interested or entitled parties can pull it. 
+These central locations are called image registries.
+1. Tagging an image
+- Each image has a so-called tag. A tag is often used to version images
+  If we do not explicitly specify a tag when working with images, then Docker automatically 
+  assumes we're referring to the latest tag
+  docker image pull alpine
+  docker image pull alpine:3.5
+2. Pushing images to a registry
+  - tag it explicitly
+  docker image tag alpine:latest gnschenker/alpine:1.0
+  - login to registry
+   docker login -u gnschenker -p <my secret password>
+  - pushing image
+  docker image push gnschenker/alpine:1.0
+## For each image that we push to Docker Hub, we automatically create a repository. A repository can be private or public
+
+## Docker volumes. 
+- Volumes allow containers to consume, produce, and modify state When a container that uses a volume dies,
+  the volume continues to exist. This is great for the durability of state.
+- all layers that stem from the underlying image are immutable, the change could only happen 
+  in the writeable container layer. If we remove the container from memory, its container layer 
+  will also be removed and with it all the changes will be irreversibly deleted
+  
