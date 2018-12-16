@@ -1,1 +1,14 @@
-
+Creating Logical Volumn
+  lsblk - to see existing partition 
+  1.creating PV
+    - partition disks
+    - pvcreate <partition_disk...>
+  2.creating VG
+    - vgcreate [-s PE_size] <VG_name>  <PV...>
+    - vgcreate 
+  3.creating LV
+    - lvcreate  <-L size> <VG_name>
+    
+Growing VG LV
+  - lvextend -L 4g -v /dev/vg00/lvol0
+  - vgextend vg00 /dev/sdn1
