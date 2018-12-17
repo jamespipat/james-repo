@@ -86,3 +86,11 @@ location ∼ \.php$ {
         fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
         include        fastcgi_params;
     }
+
+
+## Nginx Module
+- Nginx is modular
+- Nginx modules can be split into five different catagories
+- Out-of-Box Modules
+Nginx source has some modules that are included by default and they can be enabled or disabled during compile 
+time using --with or --without options
