@@ -2,19 +2,19 @@
 
 1.Interactive image creation
 attach to interactive shell in container and run package manager
-docker container -it --name sample alpine /bin/bash
-docker container diff
+> docker container -it --name sample alpine /bin/bash
+> docker container diff
 - to persist our modifications and create a new image from them
-docker container commit sample my-alpine
+> docker container commit sample my-alpine
 - to see how our custom image has been built
-docker image history my-alpine
+> docker image history my-alpine
 
 2.Dockerfiles
 - It contains instructions on how to build a custom container image
 building form base layer to higher layer when first layer was built, 
 then higher layer was built from container which has preceding layer and 
 run second statement on dockerfile and so on
-- docker image build -t . or docker image build -t -f /path/dockerfile
+> docker image build -t . or docker image build -t -f /path/dockerfile
 
 - keyword
 FROM
@@ -49,23 +49,24 @@ CMD ["8.8.8.8", "-c", "3"]
 - or just use only CMD keyword it will work as well
 CMD ping 8.8.8.8 -c 3
 
-## Best practices ##
-1. When we're rebuilding a previously built image, the only layers that are rebuilt are the ones that have changed,
-but if one layer needs to be rebuilt, all subsequent layers also need to be rebuilt.
-2. the fewer layers an image has, the faster the startup time for the container can be
-ex. RUN apt-get update \
-    && apt-get install -y ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-3. Smaller images
-  - use a .dockerignore file
-  - avoid installing unnecessary packages into the filesystem of the image
-  - use multistage builds
-  
-## Saving and loading images ##
+    ## Best practices ##
+    1. When we're rebuilding a previously built image, the only layers that are rebuilt are the ones that have changed,
+    but if one layer needs to be rebuilt, all subsequent layers also need to be rebuilt.
+    2. the fewer layers an image has, the faster the startup time for the container can be
+    ex. RUN apt-get update \
+        && apt-get install -y ca-certificates \
+        && rm -rf /var/lib/apt/lists/*
+    3. Smaller images
+      - use a .dockerignore file
+      - avoid installing unnecessary packages into the filesystem of the image
+      - use multistage builds
+
+3. Saving and loading images
+  The third way to create a new container image is by importing or loading it from a file
 - to export an existing image to a tarball
-  docker image save -o ./backup/my-alpine.tar my-alpine
+  > docker image save -o ./backup/my-alpine.tar my-alpine
 - to import it as an image into our system
-  docker image load -i ./backup/my-alpine.tar
+  > docker image load -i ./backup/my-alpine.tar
   
 ## Sharing or shipping images ##
 publish the image to a central location from which other interested or entitled parties can pull it. 
@@ -74,15 +75,15 @@ These central locations are called image registries.
 - Each image has a so-called tag. A tag is often used to version images
   If we do not explicitly specify a tag when working with images, then Docker automatically 
   assumes we're referring to the latest tag
-  docker image pull alpine
-  docker image pull alpine:3.5
+  > docker image pull alpine
+  > docker image pull alpine:3.5
 2. Pushing images to a registry
   - tag it explicitly
-  docker image tag alpine:latest gnschenker/alpine:1.0
+   > docker image tag alpine:latest gnschenker/alpine:1.0
   - login to registry
-   docker login -u gnschenker -p <my secret password>
+   > docker login -u gnschenker -p <my secret password>
   - pushing image
-  docker image push gnschenker/alpine:1.0
+   > docker image push gnschenker/alpine:1.0
 ## For each image that we push to Docker Hub, we automatically create a repository. A repository can be private or public
 
 ## Docker volumes. 
@@ -91,4 +92,35 @@ These central locations are called image registries.
 - all layers that stem from the underlying image are immutable, the change could only happen 
   in the writeable container layer. If we remove the container from memory, its container layer 
   will also be removed and with it all the changes will be irreversibly deleted
+- At container runtime, the folders defined as volumes in the Dockerfile are excluded from the union filesystem 
+  and thus any changes in those folders do not change the container layer but are persisted to the respective volume
+
+- To create a new data volume
+  > docker volume create my-data
+- find out what we creating
+  > docker volumn inspect my-data
+- Mounting a volume
+  mount my-data volumn in /data folder inside container
+  > docker container run --name test -it -v my-data:/data alpine /bin/sh
+  data in a Docker volume persists beyond the lifetime of a container, and also that volumes can be reused by other
+- Removing volumes
+  It is important to remember that removing a volume destroys the containing data irreversibly
+  > docker volume rm my-data 
+  > docker container rm -f $(docker container ls -aq)
   
+  Sharing data between containers
+    - the whole filesystem visible to an application running inside a container is private to this application 
+    and no other application running in a different container can interfere with it.
+    but We can create a volume and mount it to container A as well as to container B
+    > docker container run -it --name writer -v shared-data:/data alpine /bin/sh
+    > docker container run -it --name reader -v shared-data:/app/data:ro ubuntu:17.04 /bin/bash (read-only permission)
+   
+  Host volumes
+    - it is very useful to use volumes that mount from a specific host folder
+    - the updates are now propagated bi-directionally. If you make changes on the host they will be 
+    propagated to the container and vice versa
+    - when you mount the current folder into the container target folder, /usr/share/nginx/html, 
+    the content that is already there is replaced by the content of the host folder.
+    > docker container run -d -v $(pwd):/usr/share/nginx/html -p 8080:80 --name my-site my-website:1.0
+   
+   
