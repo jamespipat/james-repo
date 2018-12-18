@@ -1,6 +1,6 @@
 global CLI
-nginx -s reload
-nginx -t -c /etc/nginx/nginx.conf
+> nginx -s reload
+> nginx -t -c /etc/nginx/nginx.conf
 
 ** if there are many location directives, it will stop at the first match
 
@@ -86,6 +86,55 @@ location ∼ \.php$ {
         fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
         include        fastcgi_params;
     }
+	
+## INTERNAL REDIRECTS
+server {
+    listen      80;
+    server_name www.site1.com;
+    return      301 http://site1.com$request_uri;
+}
+server {
+    listen       80;
+    server_name  site1.com;
+
+    root  "/usr/share/nginx/html/site1/Shield Theme";
+
+    location / {
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+## SITES USING DIFFERENT PORTS
+- you can configure server blocks in a way that multiple server blocks with the same name exist, 
+but are listening on different ports.
+server {
+	listen 80;
+	root /var/www/html/site1;
+	...
+}
+server {
+	listen 8080;
+	root /var/www/site2;
+	...
+}
+
+## BLOCKING ACCESS
+server {
+	listen 8080;
+	return 444;
+	root /var/www/site2;
+	...
+}
+** it is non-standard code for nginx
+
+
+
+
 
 
 ## Nginx Module
@@ -94,3 +143,27 @@ location ∼ \.php$ {
 - Out-of-Box Modules
 Nginx source has some modules that are included by default and they can be enabled or disabled during compile 
 time using --with or --without options
+
+
+## Nginx Architecture
+- Master Process is a very effective manager. It manages the resources that, in turn, carry on the actual work 
+of serving the client requests
+- the worker processes execute their own jobs (waiter)
+- cache loader and cache manager deal with cache
+** process vs. thread
+- Threads reside inside a process, the work is done inside a process using one or many threads.
+- each worker process in Nginx is single threaded and runs independently. Their core job is to grab 
+new connections and process them as quickly as possible. You can use thread pools in special use cases 
+where you can have multiple threads per process (taking care of blocking call or slow customer)
+- Just because you have an option of thread pool shouldn't imply that you use it Blocking has a tendency 
+to degrade the performance in a BIG way!
+
+# host static websites
+- The static sites contain a lot of resources like images, stylesheets, JavaScript files, html, text, PDF, and so on
+- The basic nature of the content is that it is made once and served multiple times to the visitors
+** Scale Up Vs. Scale Out
+	- Scale Up: adding more CPU or RAM might help depending on the workload
+	- Scale Out: add more servers in order to keep up with the traffic
+- You can host multiple websites on the same server and differentiate them using 
+  server blocks (similar to a virtual host in apache)
+- 
