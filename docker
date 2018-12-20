@@ -123,4 +123,32 @@ These central locations are called image registries.
     the content that is already there is replaced by the content of the host folder.
     > docker container run -d -v $(pwd):/usr/share/nginx/html -p 8080:80 --name my-site my-website:1.0
    
-   
+## gathering information
+    > docker system info
+    > docker system df [-v]
+    
+## pruning unused resorces
+    > docker container prune [-f] (remove all not running container)
+    - the reason is that layers are immutable, Thus, when something in the source that is used to build a layer is changed, 
+    the very layer has to be rebuilt and the previous version will be abandoned.
+    > docker image prune [-f ] (remove orphaned image layers)
+    > docker image prune -f --all  (remove all unused images)
+    > docker volume prune (remove all volumes that are not currently in use)
+    > docker volume prune --filter 'label=demo' --filter 'label=test' (can use filter)
+
+## distributed application architecture
+- stateful components are database services or services that create files.  
+- On the other hand, application components that do not create or modify persistent data are called stateless components.
+    
+    
+## networking    
+- pathways that we can use to send data packets back and forth between containers. These pathways are called networks
+- all traffic to the host comes through eth0. The Linux bridge is responsible for the routing of the network traffic between 
+  the host's network and the subnet of the bridge network
+> docker network ls
+> docker network inspect bridge
+- by default When the Docker daemon runs for the first time, it creates a Linux bridge and calls it docker0
+- looking at the IP address management (IPAM) block, IPAM is software that is used to track IP addresses that are used on a computer
+- it is a recommended best practice to not run all containers on the same network
+> docker network create --driver bridge sample-net
+>
