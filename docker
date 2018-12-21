@@ -1,4 +1,4 @@
-## There are three ways to create a new container image ##
+# There are three ways to create a new container image
 
 1.Interactive image creation
 attach to interactive shell in container and run package manager
@@ -68,7 +68,7 @@ CMD ping 8.8.8.8 -c 3
 - to import it as an image into our system
   > docker image load -i ./backup/my-alpine.tar
   
-## Sharing or shipping images ##
+# Sharing or shipping images
 publish the image to a central location from which other interested or entitled parties can pull it. 
 These central locations are called image registries.
 1. Tagging an image
@@ -86,7 +86,7 @@ These central locations are called image registries.
    > docker image push gnschenker/alpine:1.0
 ## For each image that we push to Docker Hub, we automatically create a repository. A repository can be private or public
 
-## Docker volumes. 
+# Docker volumes. 
 - Volumes allow containers to consume, produce, and modify state When a container that uses a volume dies,
   the volume continues to exist. This is great for the durability of state.
 - all layers that stem from the underlying image are immutable, the change could only happen 
@@ -108,14 +108,14 @@ These central locations are called image registries.
   > docker volume rm my-data 
   > docker container rm -f $(docker container ls -aq)
   
-  Sharing data between containers
+  ## Sharing data between containers
     - the whole filesystem visible to an application running inside a container is private to this application 
     and no other application running in a different container can interfere with it.
     but We can create a volume and mount it to container A as well as to container B
     > docker container run -it --name writer -v shared-data:/data alpine /bin/sh
     > docker container run -it --name reader -v shared-data:/app/data:ro ubuntu:17.04 /bin/bash (read-only permission)
    
-  Host volumes
+  ## Host volumes
     - it is very useful to use volumes that mount from a specific host folder
     - the updates are now propagated bi-directionally. If you make changes on the host they will be 
     propagated to the container and vice versa
@@ -123,11 +123,11 @@ These central locations are called image registries.
     the content that is already there is replaced by the content of the host folder.
     > docker container run -d -v $(pwd):/usr/share/nginx/html -p 8080:80 --name my-site my-website:1.0
    
-## gathering information
+# gathering information
     > docker system info
     > docker system df [-v]
     
-## pruning unused resorces
+# pruning unused resorces
     > docker container prune [-f] (remove all not running container)
     - the reason is that layers are immutable, Thus, when something in the source that is used to build a layer is changed, 
     the very layer has to be rebuilt and the previous version will be abandoned.
@@ -136,12 +136,12 @@ These central locations are called image registries.
     > docker volume prune (remove all volumes that are not currently in use)
     > docker volume prune --filter 'label=demo' --filter 'label=test' (can use filter)
 
-## distributed application architecture
+# distributed application architecture
 - stateful components are database services or services that create files.  
 - On the other hand, application components that do not create or modify persistent data are called stateless components.
     
     
-## networking    
+# networking    
 - pathways that we can use to send data packets back and forth between containers. These pathways are called networks
 - all traffic to the host comes through eth0. The Linux bridge is responsible for the routing of the network traffic between 
   the host's network and the subnet of the bridge network
@@ -151,4 +151,29 @@ These central locations are called image registries.
 - looking at the IP address management (IPAM) block, IPAM is software that is used to track IP addresses that are used on a computer
 - it is a recommended best practice to not run all containers on the same network
 > docker network create --driver bridge sample-net
->
+> docker network inspect sample-net | grep Subnet
+- specify our own subnet range when creating a network
+> docker network create --driver bridge --subnet "10.1.0.0/16" test-net
+- MAC address and networkID of the new created one is the same as a bridge network container
+- creating container attach to network
+> docker container run --name c3 -d --network test-net [--network ...] alpine:latest ping 127.0.0.1
+(by default, if not specified, it will attach to brigde network)
+- if containers are in the same network, we can use the name of container to comunicate each other.
+  the name resolution provided by the Docker DNS service
+  ## The host network
+  - it is strongly recommended that you do not run any such container attached to the host network 
+  ## The null network
+  - run a few application services or jobs that do not need any network connection at all to execute the task
+  > docker container run --name nonet -it --network none alpine:latest /bin/sh
+  ##  using the same network namespace
+  - Normally, Docker creates a new network namespace for each container we run
+  - This is useful when we want to debug the network of an existing container without running 
+    additional processes inside that container.
+    > 1.docker network create --driver bridge test-net
+    > 2.docker container run --name web -d --network test-net nginx:alpine
+  - there is diference between the containers on the same network and runing in the same network namespace, 
+    the communication happens over localhost.
+  ## Port management
+  - container ports and host ports exist completely independently, and by default have nothing in common at all
+  > docker container run --name web2 -p <host_port>:<container_port>/tcp(or udp) -d nginx:alpine
+  > docker container port web2
