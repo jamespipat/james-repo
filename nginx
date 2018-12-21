@@ -87,7 +87,7 @@ location ∼ \.php$ {
         include        fastcgi_params;
     }
 	
-## INTERNAL REDIRECTS
+# INTERNAL REDIRECTS
 server {
     listen      80;
     server_name www.site1.com;
@@ -109,7 +109,7 @@ server {
     }
 }
 
-## SITES USING DIFFERENT PORTS
+# SITES USING DIFFERENT PORTS
 - you can configure server blocks in a way that multiple server blocks with the same name exist, 
 but are listening on different ports.
 server {
@@ -123,7 +123,7 @@ server {
 	...
 }
 
-## BLOCKING ACCESS
+# BLOCKING ACCESS
 server {
 	listen 8080;
 	return 444;
@@ -137,7 +137,7 @@ server {
 
 
 
-## Nginx Module
+# Nginx Module
 - Nginx is modular
 - Nginx modules can be split into five different catagories
 - Out-of-Box Modules
@@ -145,7 +145,7 @@ Nginx source has some modules that are included by default and they can be enabl
 time using --with or --without options
 
 
-## Nginx Architecture
+# Nginx Architecture
 - Master Process is a very effective manager. It manages the resources that, in turn, carry on the actual work 
 of serving the client requests
 - the worker processes execute their own jobs (waiter)
@@ -166,4 +166,21 @@ to degrade the performance in a BIG way!
 	- Scale Out: add more servers in order to keep up with the traffic
 - You can host multiple websites on the same server and differentiate them using 
   server blocks (similar to a virtual host in apache)
-- 
+	## best practices
+	1. dont give permission 777 
+	2. dont use multiple root directives inside location block
+	server {
+    server_name www.site1.com;
+    location / {
+        root /usr/share/nginx/html;
+        # [...]
+      }
+    location /somewhere {
+        root /usr/share/nginx/html;
+        # [...]
+      }
+    }
+	3. saparate config file for each website
+	
+# host dynamic websites
+
