@@ -1,4 +1,4 @@
-Creating Logical Volumn
+# Creating Logical Volumn
   lsblk - to see existing partition 
   1.creating PV
     - partition disks
@@ -12,3 +12,26 @@ Creating Logical Volumn
 Growing VG LV
   - lvextend -L 4g -v /dev/vg00/lvol0
   - vgextend vg00 /dev/sdn1
+
+# static ip adderss
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens33
+UUID=74e12813-979e-4e04-be37-d05245b1ec9d
+DEVICE=ens33
+ONBOOT=yes
+ZONE=public
+IPADDR=10.70.80.50
+PREFIX=24
+GATEWAY=10.70.80.1
+DNS1=203.144.206.29
+DNS2=209.144.206.49
