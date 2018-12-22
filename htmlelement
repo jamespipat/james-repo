@@ -1,4 +1,4 @@
-- organizational elements : span the entire width of the webpage by default. As such, they are “block elements”
+# organizational elements : span the entire width of the webpage by default. As such, they are “block elements”
 	<header></header> <footer></footer>
 	1.article element: the group of sections form an independent part of a web page.
 	<article>
@@ -31,9 +31,18 @@
 	7.footer element: is for grouping together information to form a footer. Typically, the footer holds content such as 
 	copyright data, author information, or related links
 	
-- Table element: is a block element
-	<caption></caption> ## if you woold like
+# Table element: is a block element
+	<caption></caption> ## if you would like
 	<tr><th>...</th></tr>
 	<tr><td>...</td></tr>
-	
+- thead tbody element: is a block element (other element should indent within), if you dont want to stick with header 
+  at the first row, The preferred way to differentiate is to put the top cells’ row (or rows) in a thead element 
+  and put the subsequent rows in a tbody element
+- detail element: provide information of sth, it displaya when click at triangle
+
+
+# pseudo-class selector
+- if the number of elements that you want to display with a special format is large, then quite a few 
+  class="value" code insertions would be required.
+- 
 	
