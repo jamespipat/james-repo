@@ -39,10 +39,15 @@
   at the first row, The preferred way to differentiate is to put the top cells’ row (or rows) in a thead element 
   and put the subsequent rows in a tbody element
 - detail element: provide information of sth, it displaya when click at triangle
+- role atribute: inform readers that table for specific purpose
 
 
 # pseudo-class selector
 - if the number of elements that you want to display with a special format is large, then quite a few 
   class="value" code insertions would be required.
-- 
-	
+  
+  
+# Links and Images
+- a element: 
+	href="link" attribute
+	download="filename" attribute
