@@ -48,6 +48,6 @@
   
   
 # Links and Images
-- a element: 
+- a element: is a phrasing element which means that it displays “inline,” like a phrase within a paragraph
 	href="link" attribute
 	download="filename" attribute
