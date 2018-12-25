@@ -184,3 +184,43 @@ to degrade the performance in a BIG way!
 	
 # host dynamic websites
 
+
+# Nginx Loadbalance
+1.Round Robin
+2.Least Connection, Optionally Weighted
+-  the request will be routed to the server with the least number of active connections
+3. IP, Generic hash
+- The best use case for using hash is probably when you have a dynamic page that makes data intensive operations that are cachable
+- Bear in mind that a hash algorithm will most likely not distribute the load evenly
+
+- Nginx load balancer routing to the back-end Nginx servers. This is not a mandatory requirement. You can choose Nginx 
+to route traffic to any other web server.
+
+# PASSING THE HOST HEADER
+- the request coming from Nginx to the back-end servers will look different than a request coming directly from the client. 
+This is because Nginx makes some adjustments to headers that it receives from the client
+   location / {
+       proxy_set_header HOST $host;
+       proxy_pass http://backend;                                                                                          
+    }
+
+# FORWARDING IP INFORMATION
+- the requests are forwarded to the back end, it has no information about where the requests have actually come from
+There are scenarios where you might want to log information about the actual visitors
+- use proxy-set-header directive
+ location / {
+        proxy_set_header HOST $proxy_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://backend;
+    }
+    
+# BUFFERING
+- turning buffering on will tell Nginx to hold the back-end data temporarily, and feed that data to the client. 
+This feature allows the back ends to be freed up quickly since they have to simply work and ensure that the data is fed to client
+
+# NGINX CACHING
+- most of static contents make a copy of the data on the load balance or proxy itself, so that the subsequent requests could be 
+served directly from the NLB instead of fetching the data every time from the backend servers
+
+proxy_cache_path path levels=1:2 keys_zone=my_cache:10m max_size=10g inactive=60m
