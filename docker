@@ -177,3 +177,7 @@ These central locations are called image registries.
   - container ports and host ports exist completely independently, and by default have nothing in common at all
   > docker container run --name web2 -p <host_port>:<container_port>/tcp(or udp) -d nginx:alpine
   > docker container port web2
+  
+# Docker Compose
+- When using Docker containers, each application service runs in its own container. Practicallly we want to run such 
+a multi-service application
