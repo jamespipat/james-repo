@@ -180,4 +180,11 @@ These central locations are called image registries.
   
 # Docker Compose
 - When using Docker containers, each application service runs in its own container. Practicallly we want to run such 
-a multi-service application
+a multi-service application or run more containers in one single docker-compose file
+> docker-compose [-f path/to/file] up/down
+> docker-compose scale <container_name>=n
+> docker-compose ps
+
+## Build image
+We can also use the docker-compose build command to just build the images of an application defined in the underlying compose file
+> docker-compose -f docker-compose.dev.yml build
