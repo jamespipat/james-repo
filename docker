@@ -188,3 +188,8 @@ a multi-service application or run more containers in one single docker-compose 
 ## Build image
 We can also use the docker-compose build command to just build the images of an application defined in the underlying compose file
 > docker-compose -f docker-compose.dev.yml build
+
+# Docker Swarm
+> docker swarm init
+> docker node ls
+> docker node inspect <name>
