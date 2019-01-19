@@ -1,0 +1,73 @@
+- the ad hoc command line can be used directly
+> ansible localhost -m ping (-m module)
+> ansible localhost -a "echo 'Hello automated World'" (-a argument)
+> ansible 192.168.10.10 -a "apt update" -u setup --become  (-u remote user)
+> ansible 192.168.10.10 -a "whoami" -u setup --become --become-user user1
+
+- having all Ansible configuration files located in a folder within the home directory of the user.
+by changing inventory location -> inventory = /home/user1/ansible/hosts or ansible -m ping -i ~/ansible/hosts
+.ini formant
+[servers]
+node0.lab.edu
+node1.lab.edu
+node2.lab.edu
+node3.lab.edu
+node4.lab.edu
+[servers]
+Node[0:4].lab.edu
+or YAML format
+all:
+   hosts:
+        node0.lab.edu
+   children:
+        lab1servers:
+            hosts:
+                 node1.lab.edu
+                 node2.lab.edu
+        lab2server:
+            hosts:
+                 node3.lab.edu
+				 
+- host and group variables
+Hosts can also have their variables stored in a YAML file. By default, this is located in the /etc/ansible/host_vars/
+	- host
+	ansible_user: <user>: defines which user Ansible will be using to manage the host (like -u)
+	ansible_host: <ip or hostname>: 
+	ansible_connection: ssh or others
+	ansible_port: port_num 
+	ansible_become: 
+	ansible_become_user: <user>: This allows Ansible to run a command as a specific user other than the remote access user.
+	ansible_ssh_pass:
+	ansible_ssh_private_key_file: <path/to/file>
+
+	- group
+	they can be defined in two ways, either on the inventory file or on separate files
+	By default, Ansible looks for them in the /etc/ansible/group_vars/ folder.
+	[labserver]
+	node0.lab.edu
+	node1.lab.edu
+
+	[labserver:vars]
+	ansible_connection=ssh
+	ansible_port=22
+
+- group of host groups
+[webservers]
+node0.lab.edu
+node1.lab.edu
+
+[fileserver]
+node2.lab.edu
+node3.lab.edu
+
+[server:children]
+webservers
+fileserver
+** However, the variable of the sub-group overrides the parent variables
+[servers:vars]
+ansible_user=setup
+ansible_private_ssh_key=/home/user/ansible.key
+
+- Playbook
+disbling gathering facts
+gather_facts: False
