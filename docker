@@ -190,6 +190,46 @@ We can also use the docker-compose build command to just build the images of an 
 > docker-compose -f docker-compose.dev.yml build
 
 # Docker Swarm
+manager
+- The manager nodes manage the swarm whilst the worker nodes execute the applications deployed into the swarm
+- Each manager has a complete copy of the full state of the swarm in its local raft store.
+- more than one manager node then these nodes work together using the Raft consensus protocol.
+- The Raft consensus protocol asks for an odd number of members
+- the first node that starts the swarm initially becomes the leader. If the leader goes away then the remaining manager nodes 
+  elect a new leader. The other nodes in the consensus group are called followers.
+- Manager nodes also maintain the state of the swarm. When we talk about the state of the swarm we mean 
+  all the information about it—for example, how many nodes are in the swarm, what are the properties of each node, 
+  such as name or IP address, what containers are running on which node in the swarm and more
+- each manager node stores a complete replica of the whole swarm state.
+worker
+- The worker nodes in turn execute application workload
+- Worker nodes communicate with each other over the so-called control plane and This communication is asynchronous
+
+- When using a Docker Swarm, we dont care about each individual docker container anymore. each node rather becomes a number
+- we just care about having a desired state defined through a service.
+
+services
+- A swarm service is an abstract thing. It is a description of the desired state of an application or application service that 
+we want to run in a swarm.
+
+
+Task
+- Part of that description was the number of replicas the service should be running. Each replica is represented by a task, 
+a swarm service contains a collection of tasks.
+
+Stack
+- A stack is used to describe a collection of swarm services that are related, we could also say that a stack describes an 
+application that consists of one to many services that we want to run on the swarm.
+- we describe a stack declaratively in a text file that is formatted using YAML
+
+Multihost-Networking
+-  a swarm that consists of a cluster of nodes or Docker hosts. Containers that are located on different nodes need to be 
+able to communicate with each other
+-  overlay network allows containers attached to the same overlay network to discover each other and freely communicate with each other.
+- Linux bridges only operate locally and cannot span across nodes, we need another mechanism. Linux VXLAN
+- each node participating in an overlay network gets a so-called VXLAN Tunnel Endpoint (VTEP) object, which intercepts the packet 
+
 > docker swarm init
 > docker node ls
+> docker swarm join --token <join-token> <IP address>:2377 (to join a node, this commmand will generate when initialize swarm)
 > docker node inspect <name>
