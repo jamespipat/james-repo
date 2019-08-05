@@ -23,6 +23,7 @@ FROM centos:7, FROM scratch
 
 RUN 
 - The argument for RUN is any valid Linux command
+- these command will run when build an image 
 
 COPY & ADD
 - these two keywords are used to copy files and folders from the host into the image that we're building
